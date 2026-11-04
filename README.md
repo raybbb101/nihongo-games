@@ -1,7 +1,7 @@
 # 日本語ゲーム / Nihongo Games
 
-日本語を遊びながら覚えるゲーム集です。サーバーも通信も不要で、ブラウザだけで動きます。
-A set of games for learning Japanese. No server and no network: it all runs in the browser.
+日本語を遊びながら覚えるゲーム集です。ブラウザだけで動きます。ソロはオフラインでも遊べます。
+A set of games for learning Japanese that run in the browser. Solo works offline.
 
 ## 遊び方 / How to play
 
@@ -22,10 +22,9 @@ Yokai march on your shrine gate carrying a sign. Type the romaji of the sign to 
 
 - **言葉ステージ / Word stages**: ボスの後に、学んだカナだけでできる言葉(おやすみ、コーヒーなど)をまるごと入力します。
   After boss stages, type whole words made only from kana you already know.
-- **遊び方の種類 / Modes**: ソロ、協力リレー(2〜4人が20秒ごとに交代)、協力同時(2人。P2 は Shift を押しながら入力)。
-  Solo, Relay co-op (2-4 players swap every 20 s), Same-time co-op (2 players; P2 holds Shift). ブラウザは複数キーボードを区別できないため、この方式です。Browsers cannot tell two keyboards apart, hence Shift.
-- **学習の補助 / Learning aids**: ステージ前の文字カード、新しい文字のローマ字ヒント、日本語音声、通してしまった文字の復習、苦手な文字ほど多く出る出題、文字図鑑。
-  Intro cards, romaji hints that fade as you improve, Japanese voice, a review list, more practice on weak kana, and a kana chart.
+- **遊び方の種類 / Modes**: ソロ、またはルームコードで最大4人の協力。 Solo, or co-op for up to 4 with a room code.
+- **学習の補助 / Learning aids**: ステージ前の文字カード(ローマ字と音声付き)、ゲーム中の繁体字中国語訳、通してしまった文字の復習、苦手な文字ほど多く出る出題、文字図鑑。
+  Intro cards with romaji and voice, Traditional Chinese translations in play (no romaji), a review list, more practice on weak kana, and a kana chart.
 - **ご褒美 / Rewards**: 星1〜3、速さと正確さで増えるコイン、ショップの武器(拳、ナイフ、手裏剣、刀、炎・氷・雷の杖、グレネード、隕石)とエフェクト。
   Stars, coins for speed and accuracy, and a shop of weapons and hit effects. 品物は見た目と音だけを変えます。Purchases only change how a hit looks and sounds.
 - **負けると / If you lose**: 鳥居のライフが尽きると敗北。倒した分のコインは残り、復習してやり直せます。
@@ -40,8 +39,17 @@ A picture appears (🐭 ねずみ); take the tile of its first kana (ね) by typ
 
 - ひらがな、カタカナ、ミックスで各15ステージ / 15 stages per script
 - 同じ頭文字の絵札が重なります(め👁️ と めがね👓 はどちらも「め」)/ Cards can share a tile
-- 1人、または2人で対戦(P2 は Shift を押しながら入力)/ 1 player, or 2 racing (P2 holds Shift)
-- お手つきをすると少しの間動けません / A wrong tile freezes you for a moment
+- ゲーム中は絵と繁体字中国語訳だけを表示し、札にローマ字は出ません / In play only the picture and its Traditional Chinese translation show
+- 1人、またはルームコードで最大4人の対戦 / Solo, or race up to 4 players with a room code
+- お手つきをすると、ソロでは少しの間、対戦ではその札の間動けません / A wrong tile freezes you for a moment, or for the rest of that card when racing
+
+## マルチプレイ / Multiplayer
+
+ホストがルームを作るとコードが出ます。友達はそのコードを入力すると、それぞれのパソコンから参加できます。
+The host creates a room and shares its code; friends type the code to join from their own computers.
+
+最初の接続にだけ無料の公開サービス PeerJS を使い、その後はブラウザ同士(WebRTC)で直接通信します。遊ぶ内容はホストのブラウザが管理するので、ホストが抜けるとルームは閉じます。学校や会社のネットワークではつながらないことがあります。
+PeerJS's free public server only introduces the browsers; after that they talk directly over WebRTC. The host's browser runs the game, so the room closes if the host leaves. Some school or office networks block it.
 
 ## 開発 / Development
 
@@ -57,4 +65,5 @@ shared/             かな・漢字データとローマ字判定(次のゲー�
 kana-defense/       カナディフェンス本体 / Kana Defense
 kana-karuta/        カナカルタ本体 / Kana Karuta
 vendor/three.min.js Three.js r158 (MIT License)
+vendor/peerjs.min.js PeerJS 1.5.4 (MIT License)
 ```

@@ -1,77 +1,77 @@
-// Words that can be drawn with a single picture. Format: word picture English.
+// Words that can be drawn with a single picture. Format: word picture Traditional-Chinese.
 // The first kana of each word is what a karuta player has to answer.
 (function (root) {
   const PICTURE_WORDS = `
-    あり 🐜 ant|あめ ☔ rain|あし 🦶 foot
-    いぬ 🐶 dog|いちご 🍓 strawberry|いえ 🏠 house
-    うま 🐴 horse|うし 🐮 cow|うみ 🌊 sea|うさぎ 🐰 rabbit
-    えんぴつ ✏️ pencil|えき 🚉 station|えび 🍤 shrimp
-    おに 👹 ogre|おかね 💰 money|おにぎり 🍙 rice ball
-    かさ ☂️ umbrella|かに 🦀 crab|かめ 🐢 turtle|かぎ 🔑 key
-    き 🌳 tree|きのこ 🍄 mushroom|きつね 🦊 fox|きりん 🦒 giraffe
-    くま 🐻 bear|くるま 🚗 car|くつ 👟 shoes|くも ☁️ cloud
-    けむし 🐛 caterpillar|ケーキ 🍰 cake|けん 🗡️ sword
-    こども 🧒 child|コーヒー ☕ coffee|こおり 🧊 ice|ことり 🐦 small bird
-    さかな 🐟 fish|さる 🐵 monkey|さくら 🌸 cherry blossom
-    しか 🦌 deer|しんぶん 📰 newspaper|しお 🧂 salt
-    すし 🍣 sushi|すいか 🍉 watermelon|スプーン 🥄 spoon
-    せんせい 🧑‍🏫 teacher|せかい 🌍 world|セーター 🧶 sweater
-    そば 🍜 noodles|そり 🛷 sled|そら 🌌 sky
-    たこ 🐙 octopus|たまご 🥚 egg|たいよう ☀️ sun
-    ちず 🗺️ map|チーズ 🧀 cheese|ちから 💪 strength
-    つき 🌙 moon|つり 🎣 fishing|つめ 💅 nail
-    て ✋ hand|てがみ ✉️ letter|テレビ 📺 TV
-    とり 🐔 chicken|とけい ⏰ clock|とら 🐯 tiger|トマト 🍅 tomato
-    なす 🍆 eggplant|ナイフ 🔪 knife|なみだ 😢 tears
-    にく 🍖 meat|にわとり 🐓 rooster|にんじん 🥕 carrot
-    ぬいぐるみ 🧸 stuffed toy|ぬの 🧵 cloth
-    ねこ 🐱 cat|ねずみ 🐭 mouse|ねむい 😴 sleepy
-    ノート 📓 notebook|のみもの 🥤 drink|のう 🧠 brain
-    はな 🌷 flower|はさみ ✂️ scissors|はち 🐝 bee|はし 🥢 chopsticks
-    ひ 🔥 fire|ひこうき ✈️ airplane|ひつじ 🐑 sheep
-    ふね 🚢 ship|ふく 👕 clothes|ふじさん 🗻 Mt. Fuji|ふゆ ⛄ winter
-    へび 🐍 snake|ヘリコプター 🚁 helicopter|へいわ 🕊️ peace
-    ほん 📚 book|ほし ⭐ star|ほね 🦴 bone
-    マイク 🎤 microphone|マスク 😷 mask|まつ 🌲 pine tree
-    みず 💧 water|みみ 👂 ear|みかん 🍊 mandarin orange
-    むし 🐞 bug|むしめがね 🔍 magnifying glass|むら 🏘️ village
-    め 👁️ eye|めがね 👓 glasses|メロン 🍈 melon
-    もも 🍑 peach|もり 🌳 forest|もち 🍡 rice cake
-    やま ⛰️ mountain|やさい 🥦 vegetable|やぎ 🐐 goat
-    ゆき ❄️ snow|ゆび ☝️ finger|ゆめ 💭 dream
-    よる 🌃 night|ヨット ⛵ yacht|よろい 🛡️ armor
-    らくだ 🐫 camel|ラーメン 🍜 ramen|ラジオ 📻 radio
-    りんご 🍎 apple|りす 🐿️ squirrel|リボン 🎀 ribbon
-    ルビー 💎 ruby|ルーレット 🎡 roulette wheel|るす 🚪 away from home
-    レモン 🍋 lemon|レストラン 🍽️ restaurant|れきし 📜 history
-    ロボット 🤖 robot|ろうそく 🕯️ candle|ロケット 🚀 rocket
-    わに 🐊 crocodile|ワイン 🍷 wine|わらう 😄 laugh
-    がっこう 🏫 school|ガソリン ⛽ gasoline
-    ぎんこう 🏦 bank|ギター 🎸 guitar
-    ぐんて 🧤 work gloves|グラス 🥂 glass
-    ゲーム 🎮 game|げんき 😀 healthy
-    ごはん 🍚 rice|ゴリラ 🦍 gorilla|ゴルフ ⛳ golf
-    ざりがに 🦞 crayfish|ざっし 📖 magazine
-    じてんしゃ 🚲 bicycle|じどうしゃ 🚙 automobile
-    ずぼん 👖 trousers|ずつう 🤕 headache
-    ゼブラ 🦓 zebra|ぜろ 0️⃣ zero
-    ぞう 🐘 elephant|ぞうり 🩴 sandals
-    だんご 🍡 dumpling|ダイヤ 💎 diamond
-    でんわ ☎️ telephone|でんしゃ 🚃 train
-    どあ 🚪 door|ドーナツ 🍩 donut
-    バナナ 🍌 banana|バス 🚌 bus
-    ビール 🍺 beer|ビデオ 📼 video
-    ぶた 🐷 pig|ぶどう 🍇 grapes
-    ベッド 🛏️ bed|ベル 🔔 bell
-    ボール ⚽ ball|ぼうし 🧢 cap
-    パン 🍞 bread|パンダ 🐼 panda
-    ピアノ 🎹 piano|ピザ 🍕 pizza
-    プレゼント 🎁 present|プール 🏊 pool
-    ペン 🖊️ pen|ペンギン 🐧 penguin
-    ポスト 📮 mailbox|ポップコーン 🍿 popcorn
+    あり 🐜 螞蟻|あめ ☔ 雨|あし 🦶 腳
+    いぬ 🐶 狗|いちご 🍓 草莓|いえ 🏠 家
+    うま 🐴 馬|うし 🐮 牛|うみ 🌊 海|うさぎ 🐰 兔子
+    えんぴつ ✏️ 鉛筆|えき 🚉 車站|えび 🍤 蝦子
+    おに 👹 鬼|おかね 💰 錢|おにぎり 🍙 飯糰
+    かさ ☂️ 雨傘|かに 🦀 螃蟹|かめ 🐢 烏龜|かぎ 🔑 鑰匙
+    き 🌳 樹|きのこ 🍄 香菇|きつね 🦊 狐狸|きりん 🦒 長頸鹿
+    くま 🐻 熊|くるま 🚗 汽車|くつ 👟 鞋子|くも ☁️ 雲
+    けむし 🐛 毛毛蟲|ケーキ 🍰 蛋糕|けん 🗡️ 劍
+    こども 🧒 小孩|コーヒー ☕ 咖啡|こおり 🧊 冰塊|ことり 🐦 小鳥
+    さかな 🐟 魚|さる 🐵 猴子|さくら 🌸 櫻花
+    しか 🦌 鹿|しんぶん 📰 報紙|しお 🧂 鹽
+    すし 🍣 壽司|すいか 🍉 西瓜|スプーン 🥄 湯匙
+    せんせい 🧑‍🏫 老師|せかい 🌍 世界|セーター 🧶 毛衣
+    そば 🍜 蕎麥麵|そり 🛷 雪橇|そら 🌌 天空
+    たこ 🐙 章魚|たまご 🥚 雞蛋|たいよう ☀️ 太陽
+    ちず 🗺️ 地圖|チーズ 🧀 起司|ちから 💪 力氣
+    つき 🌙 月亮|つり 🎣 釣魚|つめ 💅 指甲
+    て ✋ 手|てがみ ✉️ 信|テレビ 📺 電視
+    とり 🐔 雞|とけい ⏰ 時鐘|とら 🐯 老虎|トマト 🍅 番茄
+    なす 🍆 茄子|ナイフ 🔪 刀子|なみだ 😢 眼淚
+    にく 🍖 肉|にわとり 🐓 公雞|にんじん 🥕 紅蘿蔔
+    ぬいぐるみ 🧸 布偶|ぬの 🧵 布
+    ねこ 🐱 貓|ねずみ 🐭 老鼠|ねむい 😴 想睡
+    ノート 📓 筆記本|のみもの 🥤 飲料|のう 🧠 大腦
+    はな 🌷 花|はさみ ✂️ 剪刀|はち 🐝 蜜蜂|はし 🥢 筷子
+    ひ 🔥 火|ひこうき ✈️ 飛機|ひつじ 🐑 綿羊
+    ふね 🚢 船|ふく 👕 衣服|ふじさん 🗻 富士山|ふゆ ⛄ 冬天
+    へび 🐍 蛇|ヘリコプター 🚁 直升機|へいわ 🕊️ 和平
+    ほん 📚 書|ほし ⭐ 星星|ほね 🦴 骨頭
+    マイク 🎤 麥克風|マスク 😷 口罩|まつ 🌲 松樹
+    みず 💧 水|みみ 👂 耳朵|みかん 🍊 橘子
+    むし 🐞 蟲|むしめがね 🔍 放大鏡|むら 🏘️ 村莊
+    め 👁️ 眼睛|めがね 👓 眼鏡|メロン 🍈 哈密瓜
+    もも 🍑 桃子|もり 🌳 森林|もち 🍡 麻糬
+    やま ⛰️ 山|やさい 🥦 蔬菜|やぎ 🐐 山羊
+    ゆき ❄️ 雪|ゆび ☝️ 手指|ゆめ 💭 夢
+    よる 🌃 晚上|ヨット ⛵ 帆船|よろい 🛡️ 盔甲
+    らくだ 🐫 駱駝|ラーメン 🍜 拉麵|ラジオ 📻 收音機
+    りんご 🍎 蘋果|りす 🐿️ 松鼠|リボン 🎀 緞帶
+    ルビー 💎 紅寶石|ルーレット 🎡 輪盤|るす 🚪 不在家
+    レモン 🍋 檸檬|レストラン 🍽️ 餐廳|れきし 📜 歷史
+    ロボット 🤖 機器人|ろうそく 🕯️ 蠟燭|ロケット 🚀 火箭
+    わに 🐊 鱷魚|ワイン 🍷 葡萄酒|わらう 😄 笑
+    がっこう 🏫 學校|ガソリン ⛽ 汽油
+    ぎんこう 🏦 銀行|ギター 🎸 吉他
+    ぐんて 🧤 工作手套|グラス 🥂 玻璃杯
+    ゲーム 🎮 遊戲|げんき 😀 有精神
+    ごはん 🍚 米飯|ゴリラ 🦍 大猩猩|ゴルフ ⛳ 高爾夫
+    ざりがに 🦞 小龍蝦|ざっし 📖 雜誌
+    じてんしゃ 🚲 腳踏車|じどうしゃ 🚙 汽車
+    ずぼん 👖 褲子|ずつう 🤕 頭痛
+    ゼブラ 🦓 斑馬|ぜろ 0️⃣ 零
+    ぞう 🐘 大象|ぞうり 🩴 草鞋
+    だんご 🍡 糰子|ダイヤ 💎 鑽石
+    でんわ ☎️ 電話|でんしゃ 🚃 電車
+    どあ 🚪 門|ドーナツ 🍩 甜甜圈
+    バナナ 🍌 香蕉|バス 🚌 公車
+    ビール 🍺 啤酒|ビデオ 📼 錄影帶
+    ぶた 🐷 豬|ぶどう 🍇 葡萄
+    ベッド 🛏️ 床|ベル 🔔 鈴
+    ボール ⚽ 球|ぼうし 🧢 帽子
+    パン 🍞 麵包|パンダ 🐼 貓熊
+    ピアノ 🎹 鋼琴|ピザ 🍕 披薩
+    プレゼント 🎁 禮物|プール 🏊 游泳池
+    ペン 🖊️ 筆|ペンギン 🐧 企鵝
+    ポスト 📮 郵筒|ポップコーン 🍿 爆米花
   `.trim().split(/[|\n]/).map((entry) => {
-    const [text, picture, ...en] = entry.trim().split(' ');
-    return { text, picture, en: en.join(' ') };
+    const [text, picture, zh] = entry.trim().split(' ');
+    return { text, picture, zh };
   });
   root.PICTURE_WORDS = PICTURE_WORDS;
   if (typeof module !== 'undefined') module.exports = PICTURE_WORDS;

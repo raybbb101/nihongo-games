@@ -81,6 +81,14 @@ test('every word is written in the right script and listed once', () => {
   for (const list of [hira, kata]) assert.strictEqual(new Set(list.map((w) => w.text)).size, list.length);
 });
 
+test('every word and kanji has a Traditional Chinese meaning', () => {
+  for (const ch of KD.CHAPTERS) {
+    for (const s of ch.stages.filter((x) => x.words || x.chapter === 'kanji')) {
+      for (const { item } of s.pool) assert.ok(/[\u4e00-\u9fff]/.test(item.meaning), item.text);
+    }
+  }
+});
+
 test('coins reward speed and accuracy, and defeat still pays for kills', () => {
   const stage = KD.chapter('hira').stages[0];
   const base = { won: true, kills: 10, hearts: 3, stage };

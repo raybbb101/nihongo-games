@@ -13,7 +13,7 @@
   const wordItem = (w) => {
     const spoken = romajiVariants(w.say || w.text);
     const variants = [...new Set([...spoken, ...romajiVariants(w.text)])];
-    return { text: w.text, speak: w.text, variants, primary: spoken[0], meaning: w.en, readingFor: {} };
+    return { text: w.text, speak: w.text, variants, primary: spoken[0], meaning: w.zh, readingFor: {} };
   };
 
   function kanjiItem(entry) {
@@ -24,7 +24,7 @@
         if (!readingFor[v]) { variants.push(v); readingFor[v] = reading; }
       }
     }
-    return { text: entry.text, speak: entry.r[0], variants, primary: variants[0], meaning: entry.en, reading: entry.r[0], readingFor };
+    return { text: entry.text, speak: entry.r[0], variants, primary: variants[0], meaning: entry.zh, reading: entry.r[0], readingFor };
   }
 
   const BASE = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa'];
@@ -177,6 +177,7 @@
     { id: 'kanji', glyph: '漢', stages: buildKanji() },
   ];
   KD.chapter = (id) => KD.CHAPTERS.find((c) => c.id === id);
+  KD.stageById = (id) => KD.CHAPTERS.flatMap((c) => c.stages).find((s) => s.id === id);
   KD.START_HEARTS = 5;
 
   // speedScore: 0..1, how far from the gate enemies were on average when defeated.

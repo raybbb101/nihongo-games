@@ -13,7 +13,7 @@
 
   const SPAWN_Z = -46;
   const GATE_Z = 2;
-  const FONT = '"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans CJK JP",sans-serif';
+  const FONT = '"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans CJK JP","PingFang TC","Microsoft JhengHei",sans-serif';
 
   function canvasTex(w, h, draw) {
     const c = document.createElement('canvas');

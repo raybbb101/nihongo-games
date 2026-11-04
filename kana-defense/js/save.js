@@ -6,7 +6,7 @@
   const fresh = () => ({
     settings: {
       lang: (navigator.language || 'en').startsWith('ja') ? 'ja' : 'en',
-      hint: 'auto', voice: true, sfx: true, music: true, unlockAll: false,
+      voice: true, sfx: true, music: true, unlockAll: false,
     },
     stars: {},
     coins: 0,

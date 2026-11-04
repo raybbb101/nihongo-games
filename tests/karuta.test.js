@@ -9,7 +9,7 @@ const KK = globalThis.KK;
 test('picture words are well formed and start with one plain kana', () => {
   assert.ok(WORDS.length > 150);
   for (const w of WORDS) {
-    assert.ok(w.text && w.picture && w.en, JSON.stringify(w));
+    assert.ok(w.text && w.picture && /[\u4e00-\u9fff]/.test(w.zh), JSON.stringify(w));
     assert.ok(Kana.romajiVariants(w.text).length, w.text);
     assert.ok(!/^.[ゃゅょャュョァィゥェォ]/.test(w.text), `${w.text} starts with a combined sound`);
   }
@@ -50,6 +50,12 @@ test('katakana stages write tiles and words in katakana', () => {
   const { tiles, deck } = KK.buildDeck(stage);
   assert.ok(tiles.every((x) => /^[ァ-ヶ]$/.test(x.text)));
   assert.ok(deck.every((c) => !/[ぁ-ゖ]/.test(c.text)));
+});
+
+test('room codes are short, readable and forgiving to type', () => {
+  const Rooms = require('../shared/room.js');
+  for (let i = 0; i < 200; i++) assert.match(Rooms.newCode(), /^[A-HJKMNP-Z2-9]{5}$/);
+  assert.strictEqual(Rooms.normalizeCode(' ab-c 2d '), 'ABC2D');
 });
 
 test('stars: beat the tengu to pass', () => {

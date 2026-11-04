@@ -18,15 +18,15 @@
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
     const playing = game.state === 'playing';
     if (e.key === 'Escape') {
-      if (game.state === 'paused') ui.resume(); else ui.pause();
+      if (game.state === 'paused' || ui.roomMenuOpen) ui.resume(); else ui.pause();
       return;
     }
     if (playing) {
       if (e.repeat) return;
-      if (e.key === 'Backspace') { e.preventDefault(); game.onBackspace(e.shiftKey); return; }
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); game.onConfirm(e.shiftKey); return; }
+      if (e.key === 'Backspace') { e.preventDefault(); game.onBackspace(); return; }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); game.onConfirm(); return; }
       const c = letterFrom(e);
-      if (c) { e.preventDefault(); game.onLetter(c, e.shiftKey); }
+      if (c) { e.preventDefault(); game.onLetter(c); }
       return;
     }
     if (e.key === 'Enter' && !e.repeat) {
@@ -35,7 +35,15 @@
     }
   });
 
-  document.addEventListener('visibilitychange', () => { if (document.hidden) ui.pause(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && !ui.room) ui.pause(); });
+
+  // Hidden tabs get no animation frames. A host must keep the stage running for everyone else.
+  let lastBackgroundTick = performance.now();
+  setInterval(() => {
+    const now = performance.now();
+    if (document.hidden && ui.room && ui.room.isHost) game.update(Math.min(1.5, (now - lastBackgroundTick) / 1000));
+    lastBackgroundTick = now;
+  }, 200);
 
   let last = performance.now();
   function frame(now) {

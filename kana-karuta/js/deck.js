@@ -34,6 +34,8 @@
     };
   });
 
+  KK.stageById = (id) => KK.SCRIPTS.flatMap((s) => KK.stages(s)).find((x) => x.id === id);
+
   const shuffle = (list) => {
     const a = [...list];
     for (let i = a.length - 1; i > 0; i--) {

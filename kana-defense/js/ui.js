@@ -28,9 +28,10 @@
       this.root = document.getElementById('screen');
       this.hudEl = document.getElementById('hud');
       this.game = new KD.Game(world, this, save);
-      this.mode = 'solo';
-      this.names = ['P1', 'P2', 'P3', 'P4'];
-      this.playerCount = 2;
+      this.playerName = 'P1';
+      this.room = null;
+      this.roomError = '';
+      this.joinCode = '';
       this.dummy = null;
       this.applySettings();
       this.hudEl.append(
@@ -60,6 +61,7 @@
       this.hudEl.hidden = true;
       this.removeDummy();
       this.world.menuDrift = true;
+      this.inLobby = false;
       this.root.className = 'screen ' + cls;
       this.root.replaceChildren(...content.flat().filter(Boolean));
       this.root.scrollTop = 0;
@@ -79,6 +81,7 @@
     // ---------- Menus ----------
 
     title() {
+      this.leaveRoom();
       this.game.stop();
       KD.Audio.stopMusic();
       this.world.setTheme('menu');
@@ -102,23 +105,113 @@
     }
 
     playersScreen() {
-      const modes = [['solo', '🥷'], ['relay', '🔁'], ['simul', '⌨️']];
-      const needNames = this.mode === 'solo' ? 0 : this.mode === 'simul' ? 2 : this.playerCount;
+      this.leaveRoom();
       this.show('',
         this.header(t('whoPlays'), () => this.title()),
-        h('div', { class: 'cards three' }, modes.map(([id, icon]) => h('button', {
-          class: 'card mode' + (this.mode === id ? ' selected' : ''),
-          onclick: () => { this.mode = id; this.playersScreen(); },
-        }, h('div', { class: 'card-icon' }, icon), h('h3', null, t(id)), h('p', null, t(id + 'Desc'))))),
-        this.mode === 'relay' && h('div', { class: 'row center' }, h('span', null, t('players')), [2, 3, 4].map((n) => h('button', {
-          class: this.playerCount === n ? 'chip on' : 'chip', onclick: () => { this.playerCount = n; this.playersScreen(); },
-        }, String(n)))),
-        needNames > 0 && h('div', { class: 'row center' }, Array.from({ length: needNames }, (_, i) => h('input', {
-          value: this.names[i], maxlength: 10, 'aria-label': `${t('name')} ${i + 1}`,
-          oninput: (e) => { this.names[i] = e.target.value || `P${i + 1}`; },
-        }))),
-        h('div', { class: 'row center' }, h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.chapters() }, t('next'))),
+        h('label', { class: 'name-row' }, t('name'), ' ', h('input', {
+          value: this.playerName, maxlength: 10,
+          oninput: (e) => { this.playerName = e.target.value; },
+        })),
+        h('div', { class: 'cards three' },
+          h('button', { class: 'card mode', onclick: () => this.chapters() },
+            h('div', { class: 'card-icon' }, '🥷'), h('h3', null, t('solo')), h('p', null, t('soloDesc'))),
+          h('div', { class: 'card mode' },
+            h('div', { class: 'card-icon' }, '🏠'), h('h3', null, t('createRoom')), h('p', null, t('createDesc')),
+            h('div', { class: 'room-form' },
+              h('button', { class: 'primary', onclick: () => this.createRoom() }, t('createRoom')))),
+          h('div', { class: 'card mode' },
+            h('div', { class: 'card-icon' }, '🔑'), h('h3', null, t('joinRoom')), h('p', null, t('joinDesc')),
+            h('div', { class: 'room-form' },
+              h('input', {
+                id: 'room-code', class: 'code-input', value: this.joinCode, maxlength: globalThis.Rooms.CODE_LENGTH, 'aria-label': t('roomCode'), placeholder: t('roomCode'), autocomplete: 'off',
+                oninput: (e) => { this.joinCode = globalThis.Rooms.normalizeCode(e.target.value); e.target.value = this.joinCode; },
+                onkeydown: (e) => { if (e.key === 'Enter') this.joinRoom(); },
+              }),
+              h('button', { class: 'primary', onclick: () => this.joinRoom() }, t('join'))))),
+        this.roomError && h('p', { class: 'room-error', role: 'alert' }, this.roomError),
       );
+      this.roomError = '';
+    }
+
+    connecting() {
+      this.show('', h('div', { class: 'lobby' }, h('h2', null, t('connecting'))));
+    }
+
+    roomFailed(err) {
+      this.room = null;
+      this.roomError = t('err_' + err.message) === 'err_' + err.message ? t('err_network') : t('err_' + err.message);
+      this.playersScreen();
+    }
+
+    async createRoom() {
+      this.connecting();
+      try {
+        this.useRoom(await globalThis.Rooms.GameRoom.host('defense', this.playerName.trim() || 'P1'));
+        this.lobby();
+      } catch (err) { this.roomFailed(err); }
+    }
+
+    async joinRoom() {
+      if (this.joinCode.length !== globalThis.Rooms.CODE_LENGTH) {
+        this.roomError = t('err_not-found');
+        this.playersScreen();
+        return;
+      }
+      this.connecting();
+      try {
+        this.useRoom(await globalThis.Rooms.GameRoom.join('defense', this.joinCode, this.playerName.trim() || 'P2'));
+        this.lobby();
+      } catch (err) { this.roomFailed(err); }
+    }
+
+    useRoom(room) {
+      this.room = room;
+      room.onPlayers = () => { if (this.inLobby) this.lobby(); };
+      room.onPlayerLeft = (i) => this.game.playerLeft(i);
+      room.onClosed = () => {
+        this.room = null;
+        this.game.stop();
+        KD.Audio.stopMusic();
+        this.roomError = t('hostLeft');
+        this.playersScreen();
+      };
+      room.onMessage = (msg, from) => this.onRoomMessage(msg, from);
+    }
+
+    leaveRoom() {
+      this.inLobby = false;
+      this.roomMenuOpen = false;
+      if (!this.room) return;
+      this.room.leave();
+      this.room = null;
+      this.game.stop();
+    }
+
+    onRoomMessage(msg, from) {
+      if (msg.t === 'intro') this.intro(KD.stageById(msg.stage));
+      else if (msg.t === 'start') this.startStage(KD.stageById(msg.stage));
+      else this.game.receive(msg, from);
+    }
+
+    lobby() {
+      this.inLobby = true;
+      const room = this.room;
+      this.world.setTheme('menu');
+      this.show('',
+        h('header', { class: 'bar' }, h('button', { class: 'ghost', onclick: () => this.playersScreen() }, '← ', t('leaveRoom')), h('h2', null, t('players'))),
+        h('div', { class: 'lobby' },
+          room.isHost && h('p', null, t('shareCode')),
+          h('div', { class: 'room-code', 'aria-label': t('roomCode') }, room.code),
+          room.isHost && h('button', {
+            class: 'chip',
+            onclick: (e) => { navigator.clipboard && navigator.clipboard.writeText(room.code); e.target.textContent = t('copied'); },
+          }, t('copyCode')),
+          h('ul', { class: 'lobby-players' }, room.names().map((n, i) => h('li', { class: i === room.me ? 'you' : '' }, `${i === 0 ? '👑 ' : ''}${n}`))),
+          room.isHost
+            ? h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.chapters() }, t('pickStage'))
+            : h('p', { class: 'waiting' }, t('waitHost'))),
+      );
+      this.inLobby = true;
     }
 
     chapters() {
@@ -137,7 +230,7 @@
           h('div', { class: 'progress' }, h('i', { style: `width:${(done / ch.stages.length) * 100}%` })),
           h('small', null, `${done}/${ch.stages.length} · ★ ${got}/${ch.stages.length * 3}`));
       });
-      this.show('', this.header(t('pickChapter'), () => this.playersScreen()), h('div', { class: 'cards four' }, cards));
+      this.show('', this.header(t('pickChapter'), () => (this.room ? this.lobby() : this.playersScreen())), h('div', { class: 'cards four' }, cards));
     }
 
     stageLabel(stage) {
@@ -183,29 +276,27 @@
       this.world.setTheme(stage.chapter);
       const isNew = stage.newItems.length > 0;
       const items = isNew ? stage.newItems : stage.pool.map((x) => x.item);
+      const guest = this.room && !this.room.isHost;
+      if (this.room && this.room.isHost) {
+        this.room.setStarted(false);
+        this.room.broadcast({ t: 'intro', stage: stage.id });
+      }
       this.show('',
-        this.header(`${t('stage')} ${stage.index + 1} · ${this.stageLabel(stage)}`, () => this.stages(stage.chapter)),
+        guest
+          ? h('header', { class: 'bar' }, h('button', { class: 'ghost', onclick: () => this.playersScreen() }, '← ', t('leaveRoom')), h('h2', null, `${t('stage')} ${stage.index + 1} · ${this.stageLabel(stage)}`), this.coinBadge())
+          : this.header(`${t('stage')} ${stage.index + 1} · ${this.stageLabel(stage)}`, () => this.stages(stage.chapter)),
         h('h3', { class: 'section' }, t(stage.words ? 'newWords' : isNew ? 'newKana' : 'reviewKana')),
         h('div', { class: stage.words ? 'kana-cards words' : isNew ? 'kana-cards' : 'kana-cards small' }, items.map((x) => this.itemCard(x))),
         h('p', { class: 'note' },
           stage.words ? t('wordNote') : '',
           stage.words && items.some((x) => x.text.includes('ー')) ? t('longNote') : '',
           stage.words && items.some((x) => /[っッ]/.test(x.text)) ? t('smallTsuNote') : '',
-          t('howTo'),
-          this.mode === 'simul' ? ' ' + t('howSimul') : '',
-          this.mode === 'relay' ? ' ' + t('howRelay') : ''),
-        h('div', { class: 'row center' }, h('button', {
-          class: 'primary big', 'data-primary': true,
-          onclick: () => this.startStage(stage),
-        }, t('start'))),
+          t('howTo')),
+        h('div', { class: 'row center' }, guest
+          ? h('p', { class: 'waiting' }, t('waitStart'))
+          : h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.startStage(stage) }, t('start'))),
       );
       if (isNew && items.length <= 7) items.forEach((x) => KD.Audio.speak(x.speak, true));
-    }
-
-    activeNames() {
-      if (this.mode === 'solo') return [this.names[0]];
-      if (this.mode === 'simul') return this.names.slice(0, 2);
-      return this.names.slice(0, this.playerCount);
     }
 
     startStage(stage) {
@@ -217,7 +308,12 @@
       this.hudEl.hidden = false;
       this.world.setWeapon(this.save.data.weapon);
       this.world.setEffect(this.save.data.effect);
-      this.game.start(stage, this.mode, this.activeNames());
+      if (this.room && this.room.isHost) {
+        this.room.setStarted(false);
+        this.room.setStarted(true);
+        this.room.broadcast({ t: 'start', stage: stage.id });
+      }
+      this.game.start(stage, this.room ? this.room.names() : [this.playerName.trim() || 'P1'], this.room);
     }
 
     // ---------- Shop ----------
@@ -278,7 +374,7 @@
       });
       this.show('shop-screen',
         h('div', { class: 'shop-panel' },
-          this.header(t('shop'), () => this.title()),
+          this.header(t('shop'), () => (this.room ? this.lobby() : this.title())),
           h('p', { class: 'note' }, t('shopNote')),
           h('h3', { class: 'section' }, t('weapons')), list(KD.WEAPONS, 'weapon'),
           h('h3', { class: 'section' }, t('effects')), list(KD.EFFECTS, 'effect')),
@@ -292,7 +388,7 @@
 
     dex(tab) {
       const script = (fn) => Object.keys(globalThis.Kana.ROWS).flatMap((r) => rowChars(r)).map(fn).map((text) => ({ text, primary: romajiVariants(text)[0], speak: text }));
-      const kanji = () => globalThis.KANJI_GROUPS.flatMap((g) => g.items).map((e) => ({ text: e.text, primary: romajiVariants(e.r[0])[0], speak: e.r[0], meaning: e.en }));
+      const kanji = () => globalThis.KANJI_GROUPS.flatMap((g) => g.items).map((e) => ({ text: e.text, primary: romajiVariants(e.r[0])[0], speak: e.r[0], meaning: e.zh }));
       const items = tab === 'hira' ? script((c) => c) : tab === 'kata' ? script(toKatakana) : kanji();
       const cls = (text) => {
         const m = this.save.mastery(text);
@@ -324,8 +420,6 @@
         h('div', { class: 'settings' },
           h('div', { class: 'setting' }, h('span', null, t('language')), h('div', null,
             ['en', 'ja'].map((l) => h('button', { class: s.lang === l ? 'chip on' : 'chip', onclick: () => set('lang', l) }, l === 'en' ? 'English' : '日本語')))),
-          h('div', { class: 'setting column' }, h('span', null, t('hints')), h('div', null,
-            ['auto', 'always', 'off'].map((v) => h('button', { class: s.hint === v ? 'chip on' : 'chip', onclick: () => set('hint', v) }, t('hint_' + v))))),
           toggle('voice', t('voice')), toggle('sfx', t('sfx')), toggle('music', t('music')), toggle('unlockAll', t('unlockAll')),
           h('div', { class: 'setting' }, h('span', null), h('button', {
             class: 'chip danger',
@@ -357,15 +451,13 @@
     players(game) {
       const row = document.getElementById('player-row');
       row.replaceChildren(...game.players.map((p, i) => {
-        const on = game.mode !== 'relay' || game.active === i;
-        const panel = h('div', { class: 'player-box' + (on ? ' active' : ' idle'), style: `--c:${p.color}` },
+        const mine = i === game.me;
+        return h('div', { class: 'player-box' + (mine ? ' active' : ' idle') + (p.gone ? ' left-room' : ''), style: `--c:${p.color}` },
           h('div', { class: 'player-head' },
-            h('b', null, p.name + (game.mode === 'simul' && i === 1 ? ' ⇧' : '')),
+            h('b', null, p.name),
             h('span', null, `👹 ${p.kills}`),
-            p.combo > 1 && h('em', null, `${p.combo} combo`)),
-          h('div', { class: 'typed' }, p.buf || h('span', { class: 'placeholder' }, on ? t('typeHere') : '')),
-          game.mode === 'relay' && on && h('div', { class: 'relay-bar' }, h('i', { id: 'relay-fill' })));
-        return panel;
+            mine && p.combo > 1 && h('em', null, `${p.combo} combo`)),
+          mine && h('div', { class: 'typed' }, p.buf || h('span', { class: 'placeholder' }, t('typeHere'))));
       }));
     }
 
@@ -420,16 +512,6 @@
       if (fraction !== null) document.getElementById('boss-fill').style.width = `${fraction * 100}%`;
     }
 
-    relaySwitch(player) {
-      this.centerText(`${player.name}${t('yourTurn')}`, 'relay', 1300);
-      KD.Audio.play('count');
-    }
-
-    relayTime(fraction) {
-      const fill = document.getElementById('relay-fill');
-      if (fill) fill.style.width = `${fraction * 100}%`;
-    }
-
     // ---------- Results ----------
 
     end(r) {
@@ -439,6 +521,7 @@
       const accuracy = (p) => (p.correct + p.wrong ? Math.round((p.correct / (p.correct + p.wrong)) * 100) : 0);
       const top = Math.max(1, ...r.players.map((p) => p.kills));
       const multi = r.players.length > 1;
+      if (this.room && this.room.isHost) this.room.setStarted(false);
       const mvp = multi && r.players.reduce((a, b) => (b.kills > a.kills ? b : a));
 
       const chapter = KD.chapter(r.stage.chapter);
@@ -468,13 +551,17 @@
           r.leaked.length > 0 && h('div', null,
             h('h3', { class: 'section' }, t('reviewThese')),
             h('div', { class: 'kana-cards small' }, r.leaked.map((x) => this.itemCard(x)))),
-          h('div', { class: 'row center' },
-            r.won && next
-              ? h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.intro(next) }, t('nextStage'))
-              : !r.won && h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.startStage(r.stage) }, t('again')),
-            r.won && h('button', { 'data-primary': next ? undefined : true, onclick: () => this.startStage(r.stage) }, t('replay')),
-            h('button', { onclick: () => this.shop() }, '🛒 ', t('toShop')),
-            h('button', { onclick: () => this.stages(r.stage.chapter) }, t('quit')))),
+          r.guest
+            ? h('div', { class: 'row center' }, h('p', { class: 'waiting' }, t('waitHost')),
+              h('button', { onclick: () => this.shop() }, '🛒 ', t('toShop')),
+              h('button', { onclick: () => this.playersScreen() }, t('leaveRoom')))
+            : h('div', { class: 'row center' },
+              r.won && next
+                ? h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.intro(next) }, t('nextStage'))
+                : !r.won && h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.startStage(r.stage) }, t('again')),
+              r.won && h('button', { 'data-primary': next ? undefined : true, onclick: () => this.startStage(r.stage) }, t('replay')),
+              h('button', { onclick: () => this.shop() }, '🛒 ', t('toShop')),
+              h('button', { onclick: () => this.stages(r.stage.chapter) }, t('quit')))),
       );
       KD.Audio.play('coin');
     }
@@ -484,6 +571,16 @@
     pause() {
       const g = this.game;
       if (g.state !== 'playing' && g.state !== 'countdown') return;
+      if (this.room) {
+        // The stage cannot stop for one person in a room, so this menu only offers the way out.
+        this.roomMenuOpen = true;
+        this.root.className = 'screen pause-screen';
+        this.root.replaceChildren(h('div', { class: 'result-card' },
+          h('nav', { class: 'menu' },
+            h('button', { class: 'primary big', 'data-primary': true, onclick: () => this.resume() }, t('resume')),
+            h('button', { onclick: () => this.playersScreen() }, t('leaveRoom')))));
+        return;
+      }
       this.pausedFrom = g.state;
       g.state = 'paused';
       KD.Audio.stopMusic();
@@ -499,6 +596,12 @@
 
     resume() {
       const g = this.game;
+      if (this.roomMenuOpen) {
+        this.roomMenuOpen = false;
+        this.root.className = 'screen hidden';
+        this.root.replaceChildren();
+        return;
+      }
       if (g.state !== 'paused') return;
       g.state = this.pausedFrom;
       this.root.className = 'screen hidden';
