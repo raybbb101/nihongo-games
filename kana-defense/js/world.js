@@ -376,7 +376,7 @@
       const tex = this.signTexture(text);
       e.signFront.map = tex;
       e.signFront.needsUpdate = true;
-      const h = 1.72;
+      const h = Array.from(text).length >= 4 ? 1.35 : 1.72;
       const w = (tex.image.width / tex.image.height) * h;
       e.sign.scale.set(w, h, 1);
     }
@@ -692,7 +692,10 @@
     }
 
     updateEffects(dt) {
-      this.effects = this.effects.filter((fx) => {
+      // A landing weapon can start new effects, so they must survive this pass.
+      const current = this.effects;
+      this.effects = [];
+      const kept = current.filter((fx) => {
         fx.t += dt / fx.dur;
         if (fx.t < 0) return true;
         if (fx.kind === 'fly') {
@@ -728,6 +731,7 @@
         }
         return true;
       });
+      this.effects = kept.concat(this.effects);
     }
 
     trailPuff(pos, hex, n) {

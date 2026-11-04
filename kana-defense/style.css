@@ -83,6 +83,7 @@ small { color: var(--muted); }
 .stage-tile .num { position: absolute; left: 8px; top: 4px; color: var(--muted); font-size: .8rem; }
 .stage-tile small { min-height: 1.2em; }
 .stage-tile.boss { background: #f7d9c9; border-color: var(--red-d); box-shadow: 0 3px 0 var(--red-d); }
+.stage-tile.words { background: #dfeccb; border-color: #2f5a2a; box-shadow: 0 3px 0 #2f5a2a; }
 .stage-tile.locked { background: var(--washi-2); }
 .stars { color: var(--gold); letter-spacing: .08em; -webkit-text-stroke: .5px var(--ink); }
 .stars i { font-style: normal; color: rgba(60, 40, 20, .2); -webkit-text-stroke: 0; }
@@ -94,6 +95,9 @@ small { color: var(--muted); }
 .kana-card b { font-family: var(--serif); font-size: 3.2rem; line-height: 1.15; font-weight: 900; }
 .kana-card span { font-size: 1.15rem; font-weight: 800; color: var(--red-d); }
 .kana-card em { font-style: normal; color: var(--muted); }
+.kana-cards.words .kana-card { min-width: 130px; padding: 8px 12px; }
+.kana-cards.words .kana-card b { font-size: 1.9rem; }
+.kana-cards.words .kana-card span { font-size: 1rem; }
 .kana-cards.small { gap: 6px; }
 .kana-cards.small .kana-card { min-width: 58px; padding: 4px 8px; box-shadow: 0 2px 0 var(--ink); }
 .kana-cards.small .kana-card b { font-size: 1.5rem; }

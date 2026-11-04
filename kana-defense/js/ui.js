@@ -141,13 +141,14 @@
     }
 
     stageLabel(stage) {
+      if (stage.words) return t('words');
       if (stage.final) return t('final');
       if (stage.boss) return t('review');
       return stage.label;
     }
 
     stageSub(stage) {
-      if (!stage.sub) return stage.boss ? '👹' : '';
+      if (!stage.sub) return stage.words ? '📝' : stage.boss ? '👹' : '';
       return typeof stage.sub === 'string' ? stage.sub : KD.pick(stage.sub);
     }
 
@@ -159,7 +160,7 @@
         h('div', { class: 'stage-grid' }, ch.stages.map((stage, i) => {
           const open = this.save.stageOpen(ch, i);
           return h('button', {
-            class: 'stage-tile' + (stage.boss ? ' boss' : '') + (open ? '' : ' locked'), disabled: !open,
+            class: 'stage-tile' + (stage.boss ? ' boss' : '') + (stage.words ? ' words' : '') + (open ? '' : ' locked'), disabled: !open,
             onclick: () => this.intro(stage),
           },
             h('span', { class: 'num' }, String(i + 1)),
@@ -184,9 +185,13 @@
       const items = isNew ? stage.newItems : stage.pool.map((x) => x.item);
       this.show('',
         this.header(`${t('stage')} ${stage.index + 1} · ${this.stageLabel(stage)}`, () => this.stages(stage.chapter)),
-        h('h3', { class: 'section' }, t(isNew ? 'newKana' : 'reviewKana')),
-        h('div', { class: isNew ? 'kana-cards' : 'kana-cards small' }, items.map((x) => this.itemCard(x))),
-        h('p', { class: 'note' }, t('howTo'),
+        h('h3', { class: 'section' }, t(stage.words ? 'newWords' : isNew ? 'newKana' : 'reviewKana')),
+        h('div', { class: stage.words ? 'kana-cards words' : isNew ? 'kana-cards' : 'kana-cards small' }, items.map((x) => this.itemCard(x))),
+        h('p', { class: 'note' },
+          stage.words ? t('wordNote') : '',
+          stage.words && items.some((x) => x.text.includes('ー')) ? t('longNote') : '',
+          stage.words && items.some((x) => /[っッ]/.test(x.text)) ? t('smallTsuNote') : '',
+          t('howTo'),
           this.mode === 'simul' ? ' ' + t('howSimul') : '',
           this.mode === 'relay' ? ' ' + t('howRelay') : ''),
         h('div', { class: 'row center' }, h('button', {

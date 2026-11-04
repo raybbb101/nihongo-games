@@ -9,6 +9,7 @@
   function letterFrom(e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return null;
     if (/^[a-zA-Z]$/.test(e.key)) return e.key.toLowerCase();
+    if (e.code === 'Minus') return '-';
     const m = /^Key([A-Z])$/.exec(e.code || '');
     return m ? m[1].toLowerCase() : null;
   }

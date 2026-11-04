@@ -1,11 +1,19 @@
 // Chapters, stage difficulty, coin rewards and the shop catalogue.
 (function () {
   const KD = (globalThis.KD = globalThis.KD || {});
-  const { rowChars, toKatakana, romajiVariants } = globalThis.Kana;
+  const { rowChars, toKatakana, toHiragana, romajiVariants } = globalThis.Kana;
+  KD.Audio = globalThis.GameAudio;
 
   const kanaItem = (text) => {
     const variants = romajiVariants(text);
     return { text, speak: text, variants, primary: variants[0], meaning: null, readingFor: {} };
+  };
+
+  // `say` covers spellings that differ from the sound, such as the は in こんにちは.
+  const wordItem = (w) => {
+    const spoken = romajiVariants(w.say || w.text);
+    const variants = [...new Set([...spoken, ...romajiVariants(w.text)])];
+    return { text: w.text, speak: w.text, variants, primary: spoken[0], meaning: w.en, readingFor: {} };
   };
 
   function kanjiItem(entry) {
@@ -21,17 +29,18 @@
 
   const BASE = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa'];
   const VOICED = ['ga', 'za', 'da', 'ba', 'pa'];
+  const WORDS = { words: true };
   const SINGLE_PLAN = [
-    { rows: ['a'] }, { rows: ['ka'] }, { review: ['a', 'ka'] },
-    { rows: ['sa'] }, { rows: ['ta'] }, { review: ['a', 'ka', 'sa', 'ta'] },
-    { rows: ['na'] }, { rows: ['ha'] }, { rows: ['ma'] }, { review: ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma'] },
-    { rows: ['ya', 'ra'] }, { rows: ['wa'] }, { review: BASE },
-    { rows: ['ga', 'za'] }, { rows: ['da', 'ba', 'pa'] }, { rows: ['yoon'] },
+    { rows: ['a'] }, { rows: ['ka'] }, { review: ['a', 'ka'] }, WORDS,
+    { rows: ['sa'] }, { rows: ['ta'] }, { review: ['a', 'ka', 'sa', 'ta'] }, WORDS,
+    { rows: ['na'] }, { rows: ['ha'] }, { rows: ['ma'] }, { review: ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma'] }, WORDS,
+    { rows: ['ya', 'ra'] }, { rows: ['wa'] }, { review: BASE }, WORDS,
+    { rows: ['ga', 'za'] }, { rows: ['da', 'ba', 'pa'] }, WORDS, { rows: ['yoon'] }, WORDS,
     { review: [...BASE, ...VOICED, 'yoon'], final: true },
   ];
   const MIX_PLAN = [
-    { rows: ['a', 'ka'] }, { rows: ['sa', 'ta'] }, { rows: ['na', 'ha'] }, { rows: ['ma', 'ya'] }, { rows: ['ra', 'wa'] },
-    { review: BASE }, { rows: ['ga', 'za'] }, { rows: ['da', 'ba', 'pa'] }, { rows: ['yoon'] },
+    { rows: ['a', 'ka'] }, { rows: ['sa', 'ta'] }, WORDS, { rows: ['na', 'ha'] }, { rows: ['ma', 'ya'] }, WORDS, { rows: ['ra', 'wa'] },
+    { review: BASE }, WORDS, { rows: ['ga', 'za'] }, { rows: ['da', 'ba', 'pa'] }, WORDS, { rows: ['yoon'] }, WORDS,
     { review: [...BASE, ...VOICED, 'yoon'], final: true },
   ];
 
@@ -56,16 +65,56 @@
     mix: (c) => [c, toKatakana(c)],
   };
 
+  const wordListFor = {
+    hira: () => globalThis.KANA_WORDS.hira,
+    kata: () => globalThis.KANA_WORDS.kata,
+    mix: () => [...globalThis.KANA_WORDS.hira, ...globalThis.KANA_WORDS.kata],
+  };
+
+  // A word is ready once every kana in it has been taught. Small っ arrives with the voiced rows.
+  function knownWord(word, seen) {
+    const known = new Set(seen.flatMap((r) => rowChars(r).flatMap((c) => Array.from(c))));
+    if (seen.includes('ga')) known.add('っ');
+    return Array.from(toHiragana(word.text)).every((c) => c === 'ー' || known.has(c));
+  }
+
+  // The rest of a large batch still turns up in play; the intro cards stay short enough to read.
+  const MAX_INTRO_WORDS = 14;
+  const evenSample = (list, n) => (list.length <= n ? list : Array.from({ length: n }, (_, i) => list[Math.floor((i * list.length) / n)]));
+
   function buildKana(chapter, plan, offset) {
     const seen = [];
+    const taughtWords = new Set();
+    let stageNum = 0;
+    let wordNum = 0;
     return plan.map((step, i) => {
+      if (step.words) {
+        const ready = wordListFor[chapter]().filter((w) => knownWord(w, seen));
+        const fresh = ready.filter((w) => !taughtWords.has(w.text));
+        fresh.forEach((w) => taughtWords.add(w.text));
+        const base = difficulty(i / (plan.length - 1), offset, 1);
+        return {
+          id: `${chapter}-w${++wordNum}`, chapter, index: i, words: true, final: false, boss: 0, label: null, sub: null,
+          params: {
+            ...base,
+            count: Math.max(Math.min(fresh.length, MAX_INTRO_WORDS), Math.round(base.count * 0.55)),
+            speed: base.speed * 0.72,
+            interval: base.interval * 1.6,
+            maxAlive: Math.max(3, Math.round(base.maxAlive * 0.5)),
+            runnerShare: 0,
+            weaverShare: base.weaverShare * 0.5,
+          },
+          newItems: evenSample(fresh, MAX_INTRO_WORDS).map(wordItem),
+          pool: ready.map((w) => ({ item: wordItem(w), weight: fresh.includes(w) ? 1 : 0.3 })),
+        };
+      }
       const toItems = (rows) => rows.flatMap((r) => rowChars(r)).flatMap(scriptFor[chapter]).map(kanaItem);
       const p = i / (plan.length - 1);
       const params = difficulty(p, offset, 1);
       const rows = step.rows || step.review;
       const first = (r) => scriptFor[chapter](rowChars(r)[0]).join('');
       const stage = {
-        id: `${chapter}-${i + 1}`, chapter, index: i, params, final: !!step.final,
+        id: `${chapter}-${++stageNum}`, chapter, index: i, params, final: !!step.final,
         boss: step.review ? (step.final ? 14 : Math.round(lerp(4, 11, p))) : 0,
         label: step.review ? null : rows.map(first).join('・'),
         sub: step.review ? null : rows.map((r) => (r === 'yoon' ? 'kya…' : r === 'a' ? 'a i u e o' : r + '…')).join(' / '),
@@ -134,7 +183,7 @@
   KD.computeCoins = function ({ won, kills, accuracy, speedScore, hearts, stage }) {
     const killCoins = kills * 2;
     if (!won) return { kill: killCoins, speed: 0, accuracy: 0, perfect: 0, clear: 0, total: killCoins };
-    const clear = 15 + stage.index * 3 + (stage.boss ? 15 : 0);
+    const clear = 15 + stage.index * 3 + (stage.boss || stage.words ? 15 : 0);
     const speed = Math.round(Math.max(0, Math.min(1, speedScore)) * 40);
     const acc = Math.round(Math.pow(Math.max(0, accuracy), 3) * 40);
     const perfect = hearts === KD.START_HEARTS ? 25 : 0;

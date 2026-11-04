@@ -47,7 +47,7 @@
     markCorrect(text) { const m = this.mastery(text); this.data.mastery[text] = { c: m.c + 1, l: m.l }; this.write(); }
     markLeak(text) { const m = this.mastery(text); this.data.mastery[text] = { c: m.c, l: m.l + 1 }; this.write(); }
     stageOpen(chapter, i) {
-      return this.settings.unlockAll || i === 0 || this.stars(chapter.stages[i - 1].id) > 0;
+      return this.settings.unlockAll || i === 0 || this.stars(chapter.stages[i].id) > 0 || this.stars(chapter.stages[i - 1].id) > 0;
     }
     chapterCleared(chapter) { return chapter.stages.every((s) => this.stars(s.id) > 0); }
     kanjiOpen() {

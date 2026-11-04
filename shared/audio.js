@@ -1,6 +1,5 @@
 // All sound is synthesized, so the game ships with no audio files.
 (function () {
-  const KD = (globalThis.KD = globalThis.KD || {});
   let ctx = null;
   let master = null;
   let musicTimer = null;
@@ -71,7 +70,7 @@
     boss: () => { for (let i = 0; i < 4; i++) tone(70, 0.4, { type: 'sine', vol: 0.8, at: i * 0.28, slide: 0.5 }); },
   };
 
-  KD.Audio = {
+  globalThis.GameAudio = {
     settings: { sfx: true, music: true, voice: true },
     unlock: ensure,
     play(name) {

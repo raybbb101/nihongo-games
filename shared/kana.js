@@ -65,6 +65,11 @@
     for (let i = 0; i < tokens.length; i++) {
       const t = tokens[i];
       let opts;
+      if (t === 'ー') {
+        // A long vowel: type the vowel twice, or use the - key as a Japanese IME does.
+        out = out.flatMap((head) => [head + head[head.length - 1], head + '-']);
+        continue;
+      }
       if (t === 'ん') {
         const next = tokens[i + 1];
         if (!next) opts = ['n', 'nn'];

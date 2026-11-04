@@ -15,11 +15,13 @@ Yokai march on your shrine gate carrying a sign. Type the romaji of the sign to 
 
 | 章 / Chapter | ステージ / Stages | 内容 / Content |
 | --- | --- | --- |
-| ひらがな Hiragana | 17 | あ行から拗音まで / from あ to きゃ |
-| カタカナ Katakana | 17 | 同じ順番で / same order |
-| ミックス Mixed | 10 | 両方同時に / both at once |
+| ひらがな Hiragana | 23 | あ行から拗音まで+言葉ステージ / from あ to きゃ, plus word stages |
+| カタカナ Katakana | 23 | 同じ順番で、外来語の言葉ステージ付き / same order, with loanword stages |
+| ミックス Mixed | 15 | 両方同時に / both at once |
 | 漢字 Kanji | 13 | 上の全ステージをクリアで解放。数字から日常語まで / unlocks after all of the above; numbers to everyday words |
 
+- **言葉ステージ / Word stages**: ボスの後に、学んだカナだけでできる言葉(おやすみ、コーヒーなど)をまるごと入力します。
+  After boss stages, type whole words made only from kana you already know.
 - **遊び方の種類 / Modes**: ソロ、協力リレー(2〜4人が20秒ごとに交代)、協力同時(2人。P2 は Shift を押しながら入力)。
   Solo, Relay co-op (2-4 players swap every 20 s), Same-time co-op (2 players; P2 holds Shift). ブラウザは複数キーボードを区別できないため、この方式です。Browsers cannot tell two keyboards apart, hence Shift.
 - **学習の補助 / Learning aids**: ステージ前の文字カード、新しい文字のローマ字ヒント、日本語音声、通してしまった文字の復習、苦手な文字ほど多く出る出題、文字図鑑。
@@ -31,17 +33,28 @@ Yokai march on your shrine gate carrying a sign. Type the romaji of the sign to 
 
 進行状況はそのブラウザの localStorage に保存されます。Progress is saved in the browser's localStorage.
 
+## カナカルタ / Kana Karuta
+
+絵札(ねずみ🐭、めがね👓)を見て、その言葉の頭文字の札を取るカルタです。ローマ字を打つか札をクリックして答えます。遅いと天狗に取られます。
+A picture appears (🐭 ねずみ); take the tile of its first kana (ね) by typing the romaji or clicking it, before the tengu does.
+
+- ひらがな、カタカナ、ミックスで各15ステージ / 15 stages per script
+- 同じ頭文字の絵札が重なります(め👁️ と めがね👓 はどちらも「め」)/ Cards can share a tile
+- 1人、または2人で対戦(P2 は Shift を押しながら入力)/ 1 player, or 2 racing (P2 holds Shift)
+- お手つきをすると少しの間動けません / A wrong tile freezes you for a moment
+
 ## 開発 / Development
 
 ビルド不要の素の JavaScript です。Plain JavaScript, no build step.
 
 ```bash
-node --test tests/data.test.js
+node --test tests/data.test.js tests/karuta.test.js
 ```
 
 ```
 index.html          ゲーム一覧 / game launcher
 shared/             かな・漢字データとローマ字判定(次のゲームでも共用)/ data shared by future games
-kana-defense/       カナディフェンス本体 / the game
+kana-defense/       カナディフェンス本体 / Kana Defense
+kana-karuta/        カナカルタ本体 / Kana Karuta
 vendor/three.min.js Three.js r158 (MIT License)
 ```
