@@ -1,0 +1,58 @@
+(function () {
+  const KD = (globalThis.KD = globalThis.KD || {});
+  const STR = {
+    tagline: { en: 'Read the sign. Type the romaji. Protect the gate.', ja: '看板を読んで、ローマ字を打ち、鳥居を守れ。' },
+    play: { en: 'Play', ja: 'プレイ' }, shop: { en: 'Shop', ja: 'ショップ' }, dex: { en: 'Kana chart', ja: '文字図鑑' },
+    settings: { en: 'Settings', ja: '設定' }, back: { en: 'Back', ja: '戻る' }, allGames: { en: 'All games', ja: 'ゲーム一覧' },
+    whoPlays: { en: 'Who is playing?', ja: '誰が遊ぶ?' },
+    solo: { en: 'Solo', ja: 'ソロ' }, soloDesc: { en: 'Just you and the yokai.', ja: 'ひとりで妖怪に立ち向かう。' },
+    relay: { en: 'Co-op: Relay', ja: '協力:リレー' },
+    relayDesc: { en: '2-4 players share the keyboard and swap every 20 seconds.', ja: '2〜4人で20秒ごとにキーボードを交代。' },
+    simul: { en: 'Co-op: Same time', ja: '協力:同時' },
+    simulDesc: { en: '2 players type together. P2 holds Shift while typing. More enemies!', ja: '2人同時に入力。P2はShiftを押しながら打つ。敵も増える!' },
+    players: { en: 'Players', ja: '人数' }, name: { en: 'Name', ja: '名前' }, next: { en: 'Next', ja: '次へ' },
+    pickChapter: { en: 'Choose your script', ja: '文字を選ぶ' },
+    ch_hira: { en: 'Hiragana', ja: 'ひらがな' }, ch_kata: { en: 'Katakana', ja: 'カタカナ' },
+    ch_mix: { en: 'Mixed', ja: 'ミックス' }, ch_kanji: { en: 'Kanji', ja: '漢字' },
+    chd_hira: { en: 'Start here: the sounds of Japanese.', ja: 'まずはここから。' },
+    chd_kata: { en: 'The same sounds, written the angular way.', ja: '同じ音を、角ばった文字で。' },
+    chd_mix: { en: 'Both scripts at once. Faster and harder.', ja: '両方の文字が同時に。速くて難しい。' },
+    chd_kanji: { en: 'From numbers to everyday words.', ja: '数字から日常の言葉まで。' },
+    kanjiLocked: { en: 'Clear every Hiragana, Katakana and Mixed stage to unlock.', ja: 'ひらがな・カタカナ・ミックスの全ステージクリアで解放。' },
+    stage: { en: 'Stage', ja: 'ステージ' }, review: { en: 'Review + boss', ja: '復習+ボス' }, final: { en: 'Final boss', ja: '最終ボス' },
+    newKana: { en: 'New in this stage', ja: 'このステージの新しい文字' },
+    reviewKana: { en: 'Everything in this stage', ja: 'このステージに出る文字' },
+    howTo: { en: 'Type the romaji on each sign to defeat that enemy. Click a card to hear it.', ja: '看板の文字のローマ字を打つと倒せる。カードをクリックで音声。' },
+    howSimul: { en: 'P1 types normally. P2 holds Shift.', ja: 'P1は普通に、P2はShiftを押しながら入力。' },
+    howRelay: { en: 'Swap seats when the banner says so!', ja: '交代の合図が出たらキーボードを渡そう!' },
+    start: { en: 'Start (Enter)', ja: 'スタート (Enter)' },
+    resume: { en: 'Resume', ja: '再開' }, retry: { en: 'Retry stage', ja: 'やり直す' }, quit: { en: 'Stage select', ja: 'ステージ選択へ' }, paused: { en: 'Paused', ja: 'ポーズ' },
+    remaining: { en: 'left', ja: '体' }, go: { en: 'GO!', ja: 'いざ!' },
+    bossWarn: { en: 'BOSS! It changes kana every hit', ja: 'ボス出現!当てるたびに文字が変わる' },
+    yourTurn: { en: "'s turn!", ja: ' の番!' },
+    typeHere: { en: 'type…', ja: '入力…' },
+    cleared: { en: 'Stage clear!', ja: 'ステージクリア!' }, defeated: { en: 'The gate fell…', ja: '鳥居が破られた…' },
+    defeatedTip: { en: 'Coins from defeated enemies are yours to keep. Review, then try again!', ja: '倒した分のコインは手に入る。復習してもう一度!' },
+    kills: { en: 'Defeated', ja: '撃破数' }, accuracy: { en: 'Accuracy', ja: '正確さ' }, bestCombo: { en: 'Best combo', ja: '最大コンボ' }, typos: { en: 'Typos', ja: 'ミス' },
+    coins: { en: 'Coins', ja: 'コイン' }, c_kill: { en: 'Enemies', ja: '撃破' }, c_clear: { en: 'Clear', ja: 'クリア' }, c_speed: { en: 'Speed', ja: '速さ' }, c_accuracy: { en: 'Accuracy', ja: '正確さ' }, c_perfect: { en: 'Gate unharmed', ja: 'ノーダメージ' },
+    reviewThese: { en: 'These got through. Look again:', ja: '通してしまった文字。もう一度見よう:' },
+    nextStage: { en: 'Next stage (Enter)', ja: '次のステージ (Enter)' }, again: { en: 'Try again (Enter)', ja: 'もう一度 (Enter)' }, replay: { en: 'Replay', ja: 'もう一度' }, toShop: { en: 'Shop', ja: 'ショップ' },
+    chapterDone: { en: 'Chapter complete!', ja: '章をクリア!' }, kanjiUnlocked: { en: 'Kanji stages unlocked!', ja: '漢字ステージ解放!' },
+    weapons: { en: 'Weapons', ja: '武器' }, effects: { en: 'Hit effects', ja: 'エフェクト' },
+    shopNote: { en: 'Everything here is just for fun: it changes how a hit feels, not how the game plays.', ja: 'ここの品は爽快感のためのもの。見た目と音が変わる。' },
+    equip: { en: 'Equip', ja: '装備' }, equipped: { en: 'Equipped', ja: '装備中' }, buy: { en: 'Buy', ja: '購入' }, tryIt: { en: 'Try it', ja: '試す' }, notEnough: { en: 'Not enough coins', ja: 'コイン不足' },
+    dexNote: { en: 'Green: mastered. Yellow: learning. Red: keeps getting through. Click to hear it.', ja: '緑:習得 黄:学習中 赤:苦手 クリックで音声。' },
+    language: { en: 'Language', ja: '言語' }, hints: { en: 'Romaji hints', ja: 'ローマ字ヒント' },
+    hint_auto: { en: 'Auto: while new, then when close', ja: '自動:新しい文字は常に、慣れたら接近時' },
+    hint_always: { en: 'Always', ja: '常に' }, hint_off: { en: 'Off', ja: 'なし' },
+    voice: { en: 'Japanese voice', ja: '日本語音声' }, sfx: { en: 'Sound effects', ja: '効果音' }, music: { en: 'Music', ja: '音楽' },
+    unlockAll: { en: 'Unlock all stages (preview)', ja: '全ステージ解放(お試し用)' },
+    resetSave: { en: 'Erase all progress', ja: 'データを消去' }, resetConfirm: { en: 'Erase coins, stars and purchases?', ja: 'コイン・星・購入品をすべて消しますか?' },
+    on: { en: 'On', ja: 'オン' }, off: { en: 'Off', ja: 'オフ' }, mvp: { en: 'MVP', ja: 'MVP' },
+  };
+  let lang = 'en';
+  KD.setLang = (l) => { lang = l; document.documentElement.lang = l; };
+  KD.getLang = () => lang;
+  KD.t = (key) => (STR[key] ? STR[key][lang] : key);
+  KD.pick = (obj) => obj[lang] || obj.en;
+})();
