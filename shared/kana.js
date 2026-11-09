@@ -34,6 +34,7 @@
     ぎゃ: 'gya', ぎゅ: 'gyu', ぎょ: 'gyo',
     じゃ: 'ja/jya/zya', じゅ: 'ju/jyu/zyu', じょ: 'jo/jyo/zyo',
     びゃ: 'bya', びゅ: 'byu', びょ: 'byo',
+    てぃ: 'ti/thi', でぃ: 'di/dhi', ふぁ: 'fa', ふぃ: 'fi', ふぇ: 'fe', ふぉ: 'fo', ちぇ: 'che', しぇ: 'she', じぇ: 'je',
     ぴゃ: 'pya', ぴゅ: 'pyu', ぴょ: 'pyo',
   };
 

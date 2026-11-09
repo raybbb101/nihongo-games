@@ -43,6 +43,17 @@ A picture appears (🐭 ねずみ); take the tile of its first kana (ね) by typ
 - 1人、またはルームコードで最大4人の対戦 / Solo, or race up to 4 players with a room code
 - お手つきをすると、ソロでは少しの間、対戦ではその札の間動けません / A wrong tile freezes you for a moment, or for the rest of that card when racing
 
+## カナコンビニ / Kana Konbini
+
+コンビニの店員になって、お客さんの注文(「おにぎりをください」)を聞き、名前のない商品棚から探します。商品を押すと、正しい表記と、よく似た字や順番を入れ替えた引っ掛けの3択が出ます。
+Work a convenience store: a customer asks for something, you find it on shelves that show only pictures, then pick its real spelling from three look-alikes.
+
+- 商品を10秒以内に見つけたら1ポイント、正しい字を10秒以内に選んだらもう1ポイント / 1 point for finding the item within 10 s, 1 more for the right spelling within 10 s
+- 10秒たつと答えが光るが、そのあとはポイントにならない。間違えてもその段階のポイントはなくなる / After 10 s the answer glows but no longer scores; a wrong pick also loses that step's point
+- 35秒待たせるとお客さんは帰ってしまう / Customers leave after 35 s
+- 8日分。ひらがな・カタカナ・ミックスと、商品と引っ掛けがだんだん増える / 8 days, with more products and sneakier spellings each day
+- ソロ、またはルームコードで最大4人。全員が同じお客さんを自分の画面で接客し、ポイントを競う / Solo, or up to 4 players with a room code serving the same customers and racing for points
+
 ## マルチプレイ / Multiplayer
 
 ホストがルームを作るとコードが出ます。友達はそのコードを入力すると、それぞれのパソコンから参加できます。
@@ -56,7 +67,7 @@ PeerJS's free public server only introduces the browsers; after that they talk d
 ビルド不要の素の JavaScript です。Plain JavaScript, no build step.
 
 ```bash
-node --test tests/data.test.js tests/karuta.test.js
+node --test tests/data.test.js tests/karuta.test.js tests/konbini.test.js
 ```
 
 ```
@@ -64,6 +75,7 @@ index.html          ゲーム一覧 / game launcher
 shared/             かな・漢字データとローマ字判定(次のゲームでも共用)/ data shared by future games
 kana-defense/       カナディフェンス本体 / Kana Defense
 kana-karuta/        カナカルタ本体 / Kana Karuta
+kana-konbini/       カナコンビニ本体 / Kana Konbini
 vendor/three.min.js Three.js r158 (MIT License)
 vendor/peerjs.min.js PeerJS 1.5.4 (MIT License)
 ```
