@@ -127,7 +127,7 @@
 
   KB.FIND_HINT_SECONDS = 20;
   KB.SPELL_HINT_SECONDS = 20;
-  KB.PATIENCE_SECONDS = 50;
+  KB.PATIENCE_SECONDS = 30;
   KB.starsFor = (points, max) => {
     const share = max ? points / max : 0;
     return share >= 0.9 ? 3 : share >= 0.7 ? 2 : share >= 0.4 ? 1 : 0;

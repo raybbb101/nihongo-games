@@ -50,7 +50,7 @@ Work a convenience store: a customer asks for something, you find it on shelves 
 
 - 商品を20秒以内に見つけたら1ポイント、正しい字を20秒以内に選んだらもう1ポイント / 1 point for finding the item within 20 s, 1 more for the right spelling within 20 s
 - 20秒たつと答えが光るが、そのあとはポイントにならない。間違えてもその段階のポイントはなくなる / After 20 s the answer glows but no longer scores; a wrong pick also loses that step's point
-- 50秒待たせるとお客さんは帰ってしまう / Customers leave after 50 s
+- 30秒待たせるとお客さんは帰ってしまう / Customers leave after 30 s
 - 8日分。ひらがな・カタカナ・ミックスと、商品と引っ掛けがだんだん増える / 8 days, with more products and sneakier spellings each day
 - ソロ、またはルームコードで最大4人。全員が同じお客さんを自分の画面で接客し、ポイントを競う / Solo, or up to 4 players with a room code serving the same customers and racing for points
 
