@@ -67,3 +67,9 @@ test('stars from points', () => {
   assert.strictEqual(KB.starsFor(5, 12), 1);
   assert.strictEqual(KB.starsFor(4, 12), 0);
 });
+
+test('hints come after 20 seconds, and customers wait long enough for both', () => {
+  assert.strictEqual(KB.FIND_HINT_SECONDS, 20);
+  assert.strictEqual(KB.SPELL_HINT_SECONDS, 20);
+  assert.ok(KB.PATIENCE_SECONDS > KB.FIND_HINT_SECONDS + KB.SPELL_HINT_SECONDS);
+});

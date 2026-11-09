@@ -26,7 +26,7 @@
     day: { en: 'Day', ja: '' }, dayUnit: { en: '', ja: '日目' },
     s_hira: { en: 'Hiragana', ja: 'ひらがな' }, s_kata: { en: 'Katakana', ja: 'カタカナ' }, s_mix: { en: 'Mixed', ja: 'ミックス' },
     newItems: { en: 'New on the shelves today', ja: '今日から並ぶ商品' }, allItems: { en: 'On the shelves today', ja: '今日の商品' },
-    howTo: { en: 'Find the item the customer wants, then choose its correct spelling. Only pictures are on the shelves. After 10 seconds the answer starts to glow, but then it scores nothing. Click a card to hear it.', ja: 'お客さんが欲しい商品を探し、正しい文字を選ぼう。棚には絵しかない。10秒たつと答えが光るが、そのときはポイントにならない。カードをクリックで音声。' },
+    howTo: { en: 'Find the item the customer wants, then choose its correct spelling. Only pictures are on the shelves. After 20 seconds the answer starts to glow, but then it scores nothing. Click a card to hear it.', ja: 'お客さんが欲しい商品を探し、正しい文字を選ぼう。棚には絵しかない。20秒たつと答えが光るが、そのときはポイントにならない。カードをクリックで音声。' },
     points: { en: 'pts', ja: 'ポイント' }, customer: { en: 'Customer', ja: 'お客さん' },
     listen: { en: 'Hear the order again (Space)', ja: 'もう一度聞く(スペース)' },
     notThat: { en: 'Not that one…', ja: 'それじゃないよ…' }, whichSpelling: { en: 'Which one is it?', ja: '正しい字はどれ?' },
