@@ -28,6 +28,7 @@
     newItems: { en: 'New on the shelves today', ja: '今日から並ぶ商品' }, allItems: { en: 'On the shelves today', ja: '今日の商品' },
     howTo: { en: 'Find the item the customer wants, then choose its correct spelling. Only pictures are on the shelves. After 10 seconds the answer starts to glow, but then it scores nothing. Click a card to hear it.', ja: 'お客さんが欲しい商品を探し、正しい文字を選ぼう。棚には絵しかない。10秒たつと答えが光るが、そのときはポイントにならない。カードをクリックで音声。' },
     points: { en: 'pts', ja: 'ポイント' }, customer: { en: 'Customer', ja: 'お客さん' },
+    listen: { en: 'Hear the order again (Space)', ja: 'もう一度聞く(スペース)' },
     notThat: { en: 'Not that one…', ja: 'それじゃないよ…' }, whichSpelling: { en: 'Which one is it?', ja: '正しい字はどれ?' },
     thanks: { en: 'Thank you!', ja: 'ありがとう!' }, leftShop: { en: 'Got tired of waiting and left…', ja: '待ちくたびれて帰ってしまった…' },
     shiftOver: { en: 'Shift over!', ja: 'シフト終了!' }, review: { en: 'Look again:', ja: 'もう一度見よう:' },
@@ -330,7 +331,8 @@
     for (const el of s.productEls.values()) el.classList.remove('glow', 'nope');
     s.el.customer.replaceChildren(
       h('div', { class: 'face' }, c.face),
-      h('div', { class: 'bubble' }, h('b', null, KB.phrase(c))));
+      h('div', { class: 'bubble' }, h('b', null, KB.phrase(c))),
+      h('button', { class: 'listen', 'aria-label': t('listen'), title: t('listen'), onclick: () => Sound.speak(KB.phrase(current())) }, '🔊'));
     s.el.queue.replaceChildren(...s.data.customers.slice(s.index + 1, s.index + 5).map((x) => h('span', null, x.face)));
     s.el.choices.replaceChildren();
     s.el.choices.className = 'choices';
@@ -494,6 +496,11 @@
 
   window.addEventListener('keydown', (e) => {
     if (e.target && e.target.tagName === 'INPUT') return;
+    if (shift && (shift.phase === 'find' || shift.phase === 'spell') && e.key === ' ') {
+      e.preventDefault();
+      Sound.speak(KB.phrase(current()));
+      return;
+    }
     if (shift && shift.phase === 'spell' && /^[1-3]$/.test(e.key)) {
       e.preventDefault();
       pickSpelling(current().options[Number(e.key) - 1]);
